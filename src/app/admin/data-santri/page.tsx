@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/components/providers/AuthProvider';
 import { useRouter } from 'next/navigation';
@@ -50,26 +50,17 @@ export default function DataSantriAktifPage() {
   const [jenisFilter, setJenisFilter] = useState<'Semua' | 'Santri Tetap' | 'Santri Pesantren Kilat'>('Semua');
   const [editingSantri, setEditingSantri] = useState<SantriMerged | null>(null);
   const [isSavingEdit, setIsSavingEdit] = useState(false);
+  const toastId = useRef(0);
 
-  const showToast = (type: 'success' | 'error' | 'info', message: string) => {
-    const id = Date.now();
+  const handleShowToast = (type: 'success' | 'error' | 'info', message: string) => {
+    const id = ++toastId.current;
     setToasts(prev => [...prev, { id, type, message }]);
     setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000);
   };
   const removeToast = (id: number) => setToasts(prev => prev.filter(t => t.id !== id));
 
-  useEffect(() => {
-    if (!loading) {
-      if (!user) router.push('/login');
-      else if (!isAdmin) router.push('/dashboard');
-      else fetchData();
-    }
-  }, [user, loading, isAdmin, router]);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
-      setLoadingData(true);
-      
       // 1. Ambil data statis (santri lama) dari Firebase 'santri'
       const qLama = query(collection(db, 'santri'), orderBy('no', 'asc'));
       const snapshotLama = await getDocs(qLama);
@@ -114,7 +105,15 @@ export default function DataSantriAktifPage() {
     } finally {
       setLoadingData(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (!loading) {
+      if (!user) router.push('/login');
+      else if (!isAdmin) router.push('/dashboard');
+      else void Promise.resolve().then(fetchData);
+    }
+  }, [user, loading, isAdmin, router, fetchData]);
 
   if (loading || !isAdmin || loadingData) {
     return <div className="min-h-screen flex items-center justify-center">Memuat data santri...</div>;
@@ -128,15 +127,15 @@ export default function DataSantriAktifPage() {
       if (santri.source === 'Data Lama' && santri.id) {
         await deleteDoc(doc(db, 'santri', santri.id));
         setMergedData(prev => prev.filter(s => s.id !== santri.id));
-        showToast('success', `${santri.nama} berhasil dihapus dari Data Santri.`);
+        handleShowToast('success', `${santri.nama} berhasil dihapus dari Data Santri.`);
       } else if (santri.source === 'Pendaftar Baru' && santri.id) {
         await updateDoc(doc(db, 'pendaftaran', santri.id), { status: 'Ditolak' });
         setMergedData(prev => prev.filter(s => s.id !== santri.id));
-        showToast('info', `${santri.nama} dihapus dari daftar aktif.`);
+        handleShowToast('info', `${santri.nama} dihapus dari daftar aktif.`);
       }
     } catch (error) {
       console.error("Error deleting santri:", error);
-      showToast('error', 'Terjadi kesalahan saat menghapus santri.');
+      handleShowToast('error', 'Terjadi kesalahan saat menghapus santri.');
     }
   };
 
@@ -170,7 +169,7 @@ export default function DataSantriAktifPage() {
 
   const printAttendance = () => {
     if (filteredSantri.length === 0) {
-      showToast('error', 'Tidak ada data untuk dicetak.');
+      handleShowToast('error', 'Tidak ada data untuk dicetak.');
       return;
     }
     window.print();
@@ -201,10 +200,10 @@ export default function DataSantriAktifPage() {
       }
       setMergedData((current) => current.map((item) => item.id === editingSantri.id ? editingSantri : item));
       setEditingSantri(null);
-      showToast('success', 'Data diri santri berhasil diperbarui.');
+      handleShowToast('success', 'Data diri santri berhasil diperbarui.');
     } catch (error) {
       console.error('Error editing santri:', error);
-      showToast('error', 'Gagal memperbarui data diri santri.');
+      handleShowToast('error', 'Gagal memperbarui data diri santri.');
     } finally {
       setIsSavingEdit(false);
     }

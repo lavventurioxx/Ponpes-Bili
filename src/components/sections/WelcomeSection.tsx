@@ -21,7 +21,7 @@ export function WelcomeSection() {
             
             <div className="text-gray-600 text-lg leading-relaxed space-y-4">
               <p>
-                Bismillahirrohmanirrohim. Pondok Pesantren Modern Roudlotul Abror berawal dari "Pondok Yatim Rodlotul Abror" yang didirikan oleh <strong>Yayasan Paguwarmas Maos</strong> pada 28 Maret 2016. Melalui proses perkembangan dan musyawarah, kini kami bertransformasi menjadi pesantren modern.
+                Bismillahirrohmanirrohim. Pondok Pesantren Modern Roudlotul Abror berawal dari &quot;Pondok Yatim Rodlotul Abror&quot; yang didirikan oleh <strong>Yayasan Paguwarmas Maos</strong> pada 28 Maret 2016. Melalui proses perkembangan dan musyawarah, kini kami bertransformasi menjadi pesantren modern.
               </p>
               <p>
                 Dengan ijin operasional resmi dari Kementerian Agama RI, kami berkomitmen mencetak santri yang unggul dalam iman dan ilmu, berbudaya akhlaqul karimah, serta siap menghadapi tantangan era digital dengan memadukan sistem tradisional dan metode modern.
@@ -51,7 +51,7 @@ export function WelcomeSection() {
             <div className="absolute -bottom-8 -left-8 bg-[#14462c] text-white p-6 rounded-2xl shadow-xl max-w-xs animate-float z-10">
               <svg className="w-8 h-8 text-[#c8a951] mb-3 opacity-50" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/></svg>
               <p className="text-sm font-medium leading-relaxed italic mb-3">
-                "Pendidikan bukan sekadar transfer ilmu, melainkan transformasi hati dan akhlak menuju rida Ilahi."
+                &quot;Pendidikan bukan sekadar transfer ilmu, melainkan transformasi hati dan akhlak menuju rida Ilahi.&quot;
               </p>
               <p className="text-[#c8a951] text-xs font-bold uppercase tracking-wider">— Ustadz Maftukhin (Pengasuh)</p>
             </div>

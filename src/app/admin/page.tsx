@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/providers/AuthProvider';
@@ -63,55 +63,16 @@ export default function AdminDashboardPage() {
   const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [documentLinks, setDocumentLinks] = useState<{ label: string; url: string }[] | null>(null);
   const [loadingDocuments, setLoadingDocuments] = useState<string | null>(null);
+  const toastId = useRef(0);
 
-  const showToast = (type: 'success' | 'error' | 'info', message: string) => {
-    const id = Date.now();
+  const handleShowToast = (type: 'success' | 'error' | 'info', message: string) => {
+    const id = ++toastId.current;
     setToasts(prev => [...prev, { id, type, message }]);
     setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 4000);
   };
   const removeToast = (id: number) => setToasts(prev => prev.filter(t => t.id !== id));
 
-  const openDocuments = async (pendaftar: Pendaftar) => {
-    const documents = [
-      ['Kartu Keluarga', pendaftar.kartuKeluargaUrl],
-      ['Akta Kelahiran', pendaftar.aktaKelahiranUrl],
-      ['Bukti Transfer', pendaftar.buktiTransferUrl],
-    ].filter((document): document is [string, string] => Boolean(document[1]));
-
-    if (documents.length === 0) {
-      showToast('info', 'Belum ada dokumen yang tersimpan untuk pendaftar ini.');
-      return;
-    }
-
-    setLoadingDocuments(pendaftar.id);
-    try {
-      const links = await Promise.all(documents.map(async ([label, path]) => ({
-        label,
-        url: await createPrivateDocumentUrl(path),
-      })));
-      setDocumentLinks(links);
-    } catch (error) {
-      console.error('Error membuka dokumen pendaftar:', error);
-      showToast('error', 'Dokumen tidak dapat dibuka. Pastikan policy SELECT bucket Supabase pendaftaran sudah dibuat.');
-    } finally {
-      setLoadingDocuments(null);
-    }
-  };
-
-  useEffect(() => {
-    if (!loading) {
-      if (!user) {
-        router.push('/login');
-      } else if (!isAdmin) {
-        router.push('/dashboard');
-      } else {
-        fetchPendaftar();
-      }
-    }
-  }, [user, loading, isAdmin, router]);
-
-  const fetchPendaftar = async () => {
-    setLoadingData(true);
+  const fetchPendaftar = useCallback(async () => {
     try {
       const querySnapshot = await getDocs(collection(db, 'pendaftaran'));
       const list: Pendaftar[] = [];
@@ -139,7 +100,46 @@ export default function AdminDashboardPage() {
     } finally {
       setLoadingData(false);
     }
+  }, []);
+
+  const openDocuments = async (pendaftar: Pendaftar) => {
+    const documents = [
+      ['Kartu Keluarga', pendaftar.kartuKeluargaUrl],
+      ['Akta Kelahiran', pendaftar.aktaKelahiranUrl],
+      ['Bukti Transfer', pendaftar.buktiTransferUrl],
+    ].filter((document): document is [string, string] => Boolean(document[1]));
+
+    if (documents.length === 0) {
+      handleShowToast('info', 'Belum ada dokumen yang tersimpan untuk pendaftar ini.');
+      return;
+    }
+
+    setLoadingDocuments(pendaftar.id);
+    try {
+      const links = await Promise.all(documents.map(async ([label, path]) => ({
+        label,
+        url: await createPrivateDocumentUrl(path),
+      })));
+      setDocumentLinks(links);
+    } catch (error) {
+      console.error('Error membuka dokumen pendaftar:', error);
+      handleShowToast('error', 'Dokumen tidak dapat dibuka. Pastikan policy SELECT bucket Supabase pendaftaran sudah dibuat.');
+    } finally {
+      setLoadingDocuments(null);
+    }
   };
+
+  useEffect(() => {
+    if (!loading) {
+      if (!user) {
+        router.push('/login');
+      } else if (!isAdmin) {
+        router.push('/dashboard');
+      } else {
+        void Promise.resolve().then(fetchPendaftar);
+      }
+    }
+  }, [user, loading, isAdmin, router, fetchPendaftar]);
 
   const updateStatus = async (id: string, newStatus: string) => {
     const pendaftar = pendaftarList.find(p => p.id === id);
@@ -187,7 +187,7 @@ export default function AdminDashboardPage() {
       setPendaftarList(prev => prev.map(p => p.id === id ? { ...p, status: newStatus } : p));
     } catch (error) {
       console.error("Error updating status:", error);
-      showToast('error', 'Gagal mengubah status.');
+      handleShowToast('error', 'Gagal mengubah status.');
     }
   };
 
@@ -197,7 +197,7 @@ export default function AdminDashboardPage() {
 
   const exportToExcel = () => {
     if (filteredPendaftar.length === 0) {
-      showToast('error', 'Tidak ada data untuk diexport.');
+      handleShowToast('error', 'Tidak ada data untuk diexport.');
       return;
     }
 
@@ -230,7 +230,7 @@ export default function AdminDashboardPage() {
 
   const printAttendance = () => {
     if (filteredPendaftar.length === 0) {
-      showToast('error', 'Tidak ada data untuk dicetak.');
+      handleShowToast('error', 'Tidak ada data untuk dicetak.');
       return;
     }
     window.print();
@@ -245,10 +245,10 @@ export default function AdminDashboardPage() {
       await updateDoc(doc(db, 'pendaftaran', id), data);
       setPendaftarList((current) => current.map((item) => item.id === id ? editingPendaftar : item));
       setEditingPendaftar(null);
-      showToast('success', 'Data diri siswa berhasil diperbarui.');
+      handleShowToast('success', 'Data diri siswa berhasil diperbarui.');
     } catch (error) {
       console.error('Error editing pendaftar:', error);
-      showToast('error', 'Gagal memperbarui data diri siswa.');
+      handleShowToast('error', 'Gagal memperbarui data diri siswa.');
     } finally {
       setIsSavingEdit(false);
     }
@@ -304,7 +304,10 @@ export default function AdminDashboardPage() {
               Cetak Daftar Hadir
             </button>
             <button 
-              onClick={fetchPendaftar}
+              onClick={() => {
+                setLoadingData(true);
+                void fetchPendaftar();
+              }}
               className="bg-emerald-100 text-emerald-800 px-5 py-2 rounded-lg font-bold hover:bg-emerald-200 transition-colors shadow-sm"
             >
               Refresh Data

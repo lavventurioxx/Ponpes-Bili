@@ -96,7 +96,7 @@ export default function GuruPage() {
         <div className="container mx-auto px-4 relative z-10 text-center">
           <h1 className="text-4xl md:text-5xl font-extrabold mb-4">Dewan Asatidz & Tenaga Pengajar</h1>
           <p className="text-xl text-emerald-100 max-w-2xl mx-auto">
-            Membentuk generasi qur'ani yang berakhlakul karimah di bawah bimbingan para pengajar yang kompeten dan berdedikasi.
+            Membentuk generasi qur&apos;ani yang berakhlakul karimah di bawah bimbingan para pengajar yang kompeten dan berdedikasi.
           </p>
         </div>
       </section>

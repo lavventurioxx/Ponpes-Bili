@@ -177,7 +177,7 @@ export default function AdminDashboardPage() {
 
       await batch.commit();
 
-      showToast(
+      handleShowToast(
         newStatus === 'Diterima' ? 'success' : newStatus === 'Ditolak' ? 'error' : 'info',
         newStatus === 'Diterima'
           ? `${pendaftar.namaLengkap} diterima dan otomatis tersimpan ke Data Santri Aktif.`

@@ -1,0 +1,78 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Fungsi pembantu untuk mengecek akun admin.
+    function isAdmin() {
+      return request.auth != null && (
+        request.auth.token.email == "sabilianggita@gmail.com" ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // Koleksi admin: dapat dibaca pengguna login untuk proses verifikasi,
+    // tetapi tidak dapat dibuat atau diubah dari aplikasi web.
+    match /admins/{uid} {
+      // AuthProvider hanya perlu membaca dokumen admin milik akun yang sedang login.
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // Data santri aktif hanya dapat diakses admin.
+    match /santri/{santriId} {
+      allow read, write, delete: if isAdmin();
+    }
+
+    // Data pendaftaran dapat diakses pemilik dokumen dan admin.
+    match /pendaftaran/{docId} {
+      allow create: if (
+        request.auth == null
+        && request.resource.data.userId == docId
+        && request.resource.data.status == 'Menunggu Proses'
+        && request.resource.data.email == null
+        && request.resource.data.privacyAcceptedAt is string
+      ) || isAdmin();
+
+      // Hanya admin yang dapat membaca, mengubah, atau menghapus pendaftaran.
+      allow update, read, delete: if isAdmin();
+    }
+
+    // Ringkasan aman yang dapat dipakai pendaftar untuk mengecek status tanpa akun.
+    match /status_pendaftaran/{registrationNumber} {
+      allow create: if isAdmin() || (request.auth == null
+        && request.resource.data.nomorPendaftaran == registrationNumber
+        && request.resource.data.status == 'Menunggu Proses'
+        && request.resource.data.keys().hasOnly(['nomorPendaftaran', 'status', 'submittedAt']));
+      allow get: if isAdmin() || resource.data.keys().hasOnly(['nomorPendaftaran', 'status', 'submittedAt']);
+      allow list: if false;
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Profil akun hanya dapat diakses oleh pemiliknya.
+    match /users/{userId} {
+      allow read: if signedIn() && request.auth.uid == userId;
+      allow create: if signedIn() && request.auth.uid == userId
+        && request.resource.data.role == 'user';
+      allow update: if signedIn() && request.auth.uid == userId
+        && request.resource.data.role == resource.data.role;
+      allow delete: if false;
+    }
+
+    // Struktur pengurus dan pengaturan web dapat dibaca publik, tetapi hanya admin yang dapat mengubahnya.
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Konten yang dikelola dari halaman admin.
+    match /content/{contentId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}

@@ -36,6 +36,21 @@ yarn-error.log*
 # vercel
 .vercel
 
+# local Firebase and AI tooling artifacts
+.firebase/
+.agents/
+.claude/
+skills-lock.json
+implementation_plan.md
+firestore-debug.log*
+firebase-debug.log*
+ui-debug.log*
+
+# private source records and raw institutional documents
+/data_santri.txt
+/sejarah.txt
+*.docx
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

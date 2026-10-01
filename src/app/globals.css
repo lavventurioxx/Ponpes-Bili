@@ -1,26 +1,252 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+/* ========================================
+   DESIGN SYSTEM — PP Modern Roudlotul Abror
+   Tema: Hijau Agamis Modern
+   ======================================== */
+
+/* ---------- Custom Color Palette ---------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Primary Greens (Hijau Agamis) */
+  --primary-50:  #e8f5ec;
+  --primary-100: #c8e6d0;
+  --primary-200: #a5d6b3;
+  --primary-300: #7ec495;
+  --primary-400: #5fb57f;
+  --primary-500: #3da568;
+  --primary-600: #2d7a50;
+  --primary-700: #1f6340;
+  --primary-800: #1b5e3b;
+  --primary-900: #14462c;
+  --primary-950: #0a2b1a;
+
+  /* Accent Gold (Emas Klasik) */
+  --gold-50:  #fdf8eb;
+  --gold-100: #f9edcc;
+  --gold-200: #f2d88e;
+  --gold-300: #e8c256;
+  --gold-400: #d4a83a;
+  --gold-500: #c8a951;
+  --gold-600: #a88730;
+  --gold-700: #866a24;
+  --gold-800: #6b5420;
+  --gold-900: #4a3a16;
+
+  /* Neutrals (Warm) */
+  --warm-white: #faf9f6;
+  --warm-50:    #f7f5f0;
+  --warm-100:   #edeae3;
+  --warm-200:   #ddd8cd;
+  --warm-800:   #3d3a34;
+  --warm-900:   #2a2824;
+  --warm-950:   #1a1917;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ---------- Smooth font rendering ---------- */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  color: var(--warm-900);
+  background-color: var(--warm-white);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* Shared visual texture for the main page sections. */
+main > section {
+  position: relative;
+  isolation: isolate;
+}
+
+main > section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: url('/background.jpg') center / cover no-repeat;
+  opacity: 0.08;
+  mix-blend-mode: multiply;
+}
+
+/* ---------- Scroll Behavior ---------- */
+html {
+  scroll-behavior: smooth;
+}
+
+@media print {
+  .admin-dashboard-page > * {
+    display: none !important;
+  }
+
+  .admin-dashboard-page > .admin-print-sheet {
+    display: block !important;
+  }
+
+  .admin-active-page > * {
+    display: none !important;
+  }
+
+  .admin-active-page > .admin-active-print-sheet {
+    display: block !important;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ---------- Selection Color ---------- */
+::selection {
+  background-color: var(--primary-200);
+  color: var(--primary-950);
+}
+
+/* ========================================
+   ANIMATIONS
+   ======================================== */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes subtleFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(200, 169, 81, 0.4); }
+  50% { box-shadow: 0 0 24px 4px rgba(200, 169, 81, 0.15); }
+}
+
+/* Utility classes for animations */
+.animate-fade-in-up {
+  animation: fadeInUp 0.7s ease-out both;
+}
+.animate-fade-in-left {
+  animation: fadeInLeft 0.7s ease-out both;
+}
+.animate-fade-in-right {
+  animation: fadeInRight 0.7s ease-out both;
+}
+.animate-float {
+  animation: subtleFloat 4s ease-in-out infinite;
+}
+.animate-pulse-glow {
+  animation: pulseGlow 2.5s ease-in-out infinite;
+}
+
+/* Staggered delays */
+.delay-100 { animation-delay: 0.1s; }
+.delay-200 { animation-delay: 0.2s; }
+.delay-300 { animation-delay: 0.3s; }
+.delay-400 { animation-delay: 0.4s; }
+.delay-500 { animation-delay: 0.5s; }
+.delay-600 { animation-delay: 0.6s; }
+
+/* ========================================
+   ISLAMIC GEOMETRIC PATTERN (SVG Inline)
+   ======================================== */
+.islamic-pattern {
+  background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23ffffff' stroke-width='0.5' opacity='0.08'%3E%3Cpath d='M40 0 L80 40 L40 80 L0 40Z'/%3E%3Cpath d='M40 10 L70 40 L40 70 L10 40Z'/%3E%3Cpath d='M40 20 L60 40 L40 60 L20 40Z'/%3E%3Ccircle cx='40' cy='40' r='15'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 80px 80px;
+}
+
+.islamic-pattern-dark {
+  background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%231b5e3b' stroke-width='0.5' opacity='0.06'%3E%3Cpath d='M40 0 L80 40 L40 80 L0 40Z'/%3E%3Cpath d='M40 10 L70 40 L40 70 L10 40Z'/%3E%3Cpath d='M40 20 L60 40 L40 60 L20 40Z'/%3E%3Ccircle cx='40' cy='40' r='15'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 80px 80px;
+}
+
+/* ========================================
+   GLASSMORPHISM
+   ======================================== */
+.glass {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.glass-dark {
+  background: rgba(10, 43, 26, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ========================================
+   CARD HOVER LIFT
+   ======================================== */
+.card-lift {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.card-lift:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px -12px rgba(27, 94, 59, 0.15),
+              0 8px 16px -8px rgba(27, 94, 59, 0.1);
+}
+
+/* ========================================
+   GRADIENT UTILITIES
+   ======================================== */
+.gradient-primary {
+  background: linear-gradient(135deg, var(--primary-800) 0%, var(--primary-600) 50%, var(--primary-700) 100%);
+}
+
+.gradient-gold {
+  background: linear-gradient(135deg, var(--gold-400) 0%, var(--gold-500) 50%, var(--gold-300) 100%);
+}
+
+.gradient-hero {
+  background: linear-gradient(160deg, var(--primary-950) 0%, var(--primary-800) 40%, var(--primary-700) 70%, var(--primary-600) 100%);
+}
+
+/* ========================================
+   SCROLLBAR (subtle)
+   ======================================== */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--warm-50);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--primary-300);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary-500);
 }

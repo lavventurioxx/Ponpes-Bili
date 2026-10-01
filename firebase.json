@@ -1,0 +1,25 @@
+{
+  "hosting": {
+    "site": "ponpes-bili",
+    "public": "out",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**",
+      "**/*.docx",
+      "**/data_santri.txt",
+      "**/sejarah.txt",
+      "**/firestore-debug.log*",
+      "**/firebase-debug.log*",
+      "**/ui-debug.log*",
+      "**/.agents/**",
+      "**/.claude/**",
+      "**/.firebase/**",
+      "**/skills-lock.json",
+      "**/implementation_plan.md"
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules"
+  }
+}
